@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/register/phone_register.dart';
+import 'screens/register/verify_otp.dart';
+import 'screens/register/user_registration.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +26,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    MaterialColor colorCustomM = MaterialColor(0xFFFF6700, color);
+    MaterialColor colorCustomM = MaterialColor(0xff66b88c, color);
     // MaterialColor colorCustomS = MaterialColor(0xFFffffff, color);
     return MaterialApp(
       title: 'Daily Kart',
@@ -32,6 +34,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: colorCustomM,
       ),
       home: const PhoneRegister(),
+      routes: {
+        VerifyOtp.routeName: (ctx) => VerifyOtp(),
+        UserRegistration.routeName: (ctx) => UserRegistration(),
+      },
     );
   }
 }
