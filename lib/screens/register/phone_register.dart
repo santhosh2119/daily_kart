@@ -1,5 +1,6 @@
 import 'package:daily_kart/base/dimension.dart';
 import 'package:flutter/material.dart';
+import 'verify_otp.dart';
 
 class PhoneRegister extends StatefulWidget {
   const PhoneRegister({Key? key}) : super(key: key);
@@ -11,7 +12,10 @@ class PhoneRegister extends StatefulWidget {
 class _PhoneRegisterState extends State<PhoneRegister> {
   final TextEditingController _phoneController = TextEditingController();
 
-  Future<void> _registerphone() async {}
+  Future<void> _registerphone() async {
+    Navigator.of(context).pushNamed(VerifyOtp.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -38,7 +42,7 @@ class _PhoneRegisterState extends State<PhoneRegister> {
                     padding: EdgeInsets.all(
                       Dimensions.paddingSizeLarge,
                     ),
-                    child: Text("Register"),
+                    child: Text("Send OTP"),
                   ),
                 ),
               ],
