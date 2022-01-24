@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/register/phone_register.dart';
 import 'screens/register/verify_otp.dart';
 import 'screens/register/user_registration.dart';
+import 'screens/register/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
       routes: {
         VerifyOtp.routeName: (ctx) => VerifyOtp(),
         UserRegistration.routeName: (ctx) => UserRegistration(),
+        Login.routeName: (ctx) => Login(),
       },
     );
   }

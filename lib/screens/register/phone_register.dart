@@ -1,4 +1,5 @@
 import 'package:daily_kart/base/dimension.dart';
+import 'package:daily_kart/screens/register/login.dart';
 import 'package:flutter/material.dart';
 import 'verify_otp.dart';
 
@@ -26,6 +27,11 @@ class _PhoneRegisterState extends State<PhoneRegister> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Container(
+                  height: 300,
+                  child: Image.asset('assets/images/logo.jpg'),
+                  padding: const EdgeInsets.only(bottom: 20),
+                ),
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
@@ -45,6 +51,21 @@ class _PhoneRegisterState extends State<PhoneRegister> {
                     child: Text("Send OTP"),
                   ),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  child: Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(Login.routeName);
+                        },
+                        child: const Text('Already have an account log in'),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),
