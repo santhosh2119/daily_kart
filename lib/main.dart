@@ -1,5 +1,14 @@
+import 'package:daily_kart/providers/location.dart';
+import 'package:daily_kart/screens/home/home.dart';
+import 'package:daily_kart/screens/register/locations_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/register/phone_register.dart';
+import 'screens/register/verify_otp.dart';
+import 'screens/register/user_registration.dart';
+import 'screens/register/login.dart';
+
+import 'package:daily_kart/providers/auth.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,14 +33,31 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    MaterialColor colorCustomM = MaterialColor(0xFFFF6700, color);
+    MaterialColor colorCustomM = MaterialColor(0xff66b88c, color);
     // MaterialColor colorCustomS = MaterialColor(0xFFffffff, color);
-    return MaterialApp(
-      title: 'Daily Kart',
-      theme: ThemeData(
-        primarySwatch: colorCustomM,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => Auth(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Location(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Daily Kart',
+        theme: ThemeData(
+          primarySwatch: colorCustomM,
+        ),
+        home: const LocationScreen(),
+        routes: {
+          VerifyOtp.routeName: (ctx) => const VerifyOtp(),
+          UserRegistration.routeName: (ctx) => const UserRegistration(),
+          Login.routeName: (ctx) => const Login(),
+          Home.routeName: (ctx) => const Home(),
+          PhoneRegister.routeName: (ctx) => const PhoneRegister(),
+        },
       ),
-      home: const PhoneRegister(),
     );
   }
 }
