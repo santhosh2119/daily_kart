@@ -10,8 +10,6 @@ import 'package:provider/provider.dart';
 import 'verify_otp.dart';
 
 class PhoneRegister extends StatefulWidget {
-  static const routeName = '/phone';
-
   const PhoneRegister({Key? key}) : super(key: key);
 
   @override
@@ -23,6 +21,30 @@ class _PhoneRegisterState extends State<PhoneRegister> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool loading = false;
+  void _showErrorDialog(BuildContext context, String error) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Registration Failed'),
+        content: Text(error),
+        actions: <Widget>[
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('OK!'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Login()));
+            },
+            child: const Text('Login'),
+          )
+        ],
+      ),
+    );
+  }
 
   Future<void> _registerphone() async {
     if (_formKey.currentState!.validate()) {
@@ -35,23 +57,27 @@ class _PhoneRegisterState extends State<PhoneRegister> {
         setState(() {
           loading = false;
         });
-
-        if (register[0]) {
-          //showAlert(context, isSuccess[1]);
-          Navigator.pushNamed(context, VerifyOtp.routeName,
-              arguments: _phoneController.text);
+        if (register[1]["isRegistered"]) {
+          _showErrorDialog(context, "Mobile Number Already Exits Please Login");
         } else {
-          print("whent wrong");
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => VerifyOtp(mobile: _phoneController.text)),
+          );
         }
       } catch (error) {
-        print(error);
+        rethrow;
       }
     }
     // Navigator.of(context).pushNamed(VerifyOtp.routeName);
   }
 
   _login() {
-    Navigator.of(context).pushNamed(Login.routeName);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const Login()),
+    );
   }
 
   @override
@@ -69,7 +95,7 @@ class _PhoneRegisterState extends State<PhoneRegister> {
                   children: [
                     Container(
                       height: 300,
-                      child: Image.asset('assets/images/logo.jpg'),
+                      child: Image.asset('assets/images/logo.png'),
                       padding: const EdgeInsets.only(bottom: 20),
                     ),
                     CoustomInputField(

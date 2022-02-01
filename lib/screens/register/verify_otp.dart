@@ -1,39 +1,45 @@
 import 'package:daily_kart/providers/auth.dart';
 import 'package:daily_kart/screens/home/home.dart';
+import 'package:daily_kart/screens/register/locations_screen.dart';
+import 'package:daily_kart/screens/register/phone_register.dart';
 import 'package:daily_kart/widgets/coustom_button.dart';
 import 'package:daily_kart/widgets/coustom_input_text_field.dart';
+import 'package:daily_kart/widgets/coustom_space.dart';
+import 'package:daily_kart/widgets/coustom_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:daily_kart/base/dimension.dart';
 import 'package:provider/provider.dart';
-import 'user_registration.dart';
 
 class VerifyOtp extends StatefulWidget {
-  const VerifyOtp({
-    Key? key,
-  }) : super(key: key);
-  static const routeName = '/verifyotp';
+  final String mobile;
+  const VerifyOtp({required this.mobile, Key? key}) : super(key: key);
 
   @override
   State<VerifyOtp> createState() => _VerifyOtpState();
 }
 
-bool _isInit = true;
-var mobileNumber;
-
 class _VerifyOtpState extends State<VerifyOtp> {
   final TextEditingController otpEditingController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  @override
-  void didChangeDependencies() {
-    if (_isInit) {
-      _isInit = false;
-      mobileNumber = ModalRoute.of(context)?.settings.arguments;
-      print(mobileNumber);
-    }
-    super.didChangeDependencies();
-  }
 
   bool loading = false;
+  void _showErrorDialog(BuildContext context, String error) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Invalid OTP'),
+        content: Text(error),
+        actions: <Widget>[
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('OK!'),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> verifyotp(String mobileNumber, String otp) async {
     if (_formKey.currentState!.validate()) {
@@ -47,27 +53,36 @@ class _VerifyOtpState extends State<VerifyOtp> {
           loading = false;
         });
         // print(otpstats[1]["steps_completed"]);
-        if (otpstats[0]) {
+        if (otpstats[1]['status']) {
           //showAlert(context, isSuccess[1]);
 
           if (otpstats[1]["steps_completed"] == 2) {
-            Navigator.pushNamed(
+            Navigator.push(
               context,
-              Home.routeName,
+              MaterialPageRoute(
+                  builder: (context) => LocationScreen(
+                      mobile: mobileNumber, userId: otpstats[1]["userid"])),
             );
           } else {
-            Navigator.pushNamed(
+            Navigator.push(
               context,
-              UserRegistration.routeName,
+              MaterialPageRoute(builder: (context) => Home()),
             );
           }
         } else {
-          print("whent wrong");
+          _showErrorDialog(context, "Please Enter Correct OTP");
         }
       } catch (error) {
-        print(error);
+        rethrow;
       }
     }
+  }
+
+  _register() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PhoneRegister()),
+    );
   }
 
   @override
@@ -85,10 +100,19 @@ class _VerifyOtpState extends State<VerifyOtp> {
                   children: [
                     Container(
                       height: 300,
-                      child: Image.asset('assets/images/logo.jpg'),
+                      child: Image.asset('assets/images/logo.png'),
                       padding: const EdgeInsets.only(bottom: 20),
                     ),
-                    Text(mobileNumber),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.mobile,
+                        ),
+                        CoustomTextButton(
+                            onPressed: _register, text: "Not Yours?")
+                      ],
+                    ),
                     CoustomInputField(
                       controller: otpEditingController,
                       keyboardType: TextInputType.number,
@@ -99,13 +123,14 @@ class _VerifyOtpState extends State<VerifyOtp> {
                         }
                         return null;
                       },
-                      labelText: "Pin Code",
+                      labelText: "Verification code",
                     ),
+                    const CoustomSpace(),
                     loading
                         ? const Center(child: CircularProgressIndicator())
                         : CoustomButton(
                             onPressed: () => verifyotp(
-                                mobileNumber, otpEditingController.text),
+                                widget.mobile, otpEditingController.text),
                             text: "verify OTP",
                           ),
                   ],

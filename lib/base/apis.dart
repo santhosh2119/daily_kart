@@ -6,6 +6,7 @@ class Api {
   static const checkOTP = baseUrl + "checkotp";
   static const resendOTP = baseUrl + "resendOtp";
   static const location = baseUrl + "shreejalocations";
-  static const profile = baseUrl + "personaldataupdate";
+  static const profileUpdate = baseUrl + "personaldataupdate";
   static const login = baseUrl + "login";
+  static const home = baseUrl + "home";
 }

@@ -2,6 +2,7 @@ import 'package:daily_kart/providers/auth.dart';
 import 'package:daily_kart/screens/home/home.dart';
 import 'package:daily_kart/screens/register/phone_register.dart';
 import 'package:daily_kart/widgets/coustom_button.dart';
+import 'package:daily_kart/widgets/coustom_dialog.dart';
 import 'package:daily_kart/widgets/coustom_input_text_field.dart';
 import 'package:daily_kart/widgets/coustom_space.dart';
 import 'package:daily_kart/widgets/coustom_text_button.dart';
@@ -10,7 +11,6 @@ import 'package:daily_kart/base/dimension.dart';
 import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
-  static const routeName = '/login';
   const Login({Key? key}) : super(key: key);
 
   @override
@@ -25,24 +25,17 @@ class _LoginState extends State<Login> {
   bool _loading = false;
 
   _register() {
-    Navigator.of(context).pushNamed(PhoneRegister.routeName);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PhoneRegister()),
+    );
   }
 
-  void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Error Occured'),
-        content: Text(message),
-        actions: <Widget>[
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('OK!'),
-          )
-        ],
-      ),
+  void _showErrorDialog(BuildContext context, String message, String header) {
+    CoustomDialog(
+      cxt: context,
+      header: header,
+      message: message,
     );
   }
 
@@ -52,42 +45,42 @@ class _LoginState extends State<Login> {
         _loading = true;
       });
       try {
-        await Provider.of<Auth>(context, listen: false)
-            .loginIn(mobile.text, password.text)
-            .then((value) {
-         
-          Navigator.of(context).pushNamed(Home.routeName);
-          setState(() {
-            _loading = false;
-          });
-        }).catchError((e) {
-          setState(() {
-            _loading = false;
-          });
-    
-          String errorMsg = 'Cant Authenticate you, Try Again Later';
-          if (e.toString().contains(
-              'We have blocked all requests from this device due to unusual activity. Try again later.')) {
-            errorMsg = 'Please wait as you have used limited number request';
+        final data = await Provider.of<Auth>(context, listen: false)
+            .loginIn(mobile.text, password.text);
+
+        if (data[1]["message"] != null) {
+          if (data[1]["message"] == 'Logged in successfully') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>  Home()),
+            );
           }
- 
-          _showErrorDialog(context, errorMsg);
-        });
+          if (data[1]["message"] == 'Details incorrect') {
+            setState(() {
+              _loading = false;
+            });
+            _showErrorDialog(
+                context, "Login Error", "Please Enter Valid details");
+          }
+          if (data[1]["message"] == 'User not registered') {
+            setState(() {
+              _loading = false;
+            });
+            _showErrorDialog(context, "Login Error", "User Not Registered");
+          }
+        }
       } catch (e) {
         setState(() {
           _loading = false;
         });
 
-        _showErrorDialog(context, e.toString());
+        _showErrorDialog(context, "Login Error", e.toString());
       }
     }
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
-   
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -101,7 +94,7 @@ class _LoginState extends State<Login> {
                   children: [
                     Container(
                       height: 300,
-                      child: Image.asset('assets/images/logo.jpg'),
+                      child: Image.asset('assets/images/logo.png'),
                       padding: const EdgeInsets.only(bottom: 20),
                     ),
                     CoustomInputField(

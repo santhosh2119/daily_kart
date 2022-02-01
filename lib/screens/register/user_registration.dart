@@ -1,12 +1,21 @@
-
+import 'package:daily_kart/providers/auth.dart';
+import 'package:daily_kart/screens/home/home.dart';
 import 'package:daily_kart/widgets/coustom_button.dart';
 import 'package:daily_kart/widgets/coustom_input_text_field.dart';
 import 'package:daily_kart/widgets/coustom_space.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class UserRegistration extends StatefulWidget {
-  static const routeName = '/user-register';
-  const UserRegistration({Key? key}) : super(key: key);
+  final String mobile;
+  final String userId;
+  final String areaId;
+  const UserRegistration(
+      {required this.mobile,
+      required this.userId,
+      required this.areaId,
+      Key? key})
+      : super(key: key);
   @override
   _UserRegistrationState createState() => _UserRegistrationState();
 }
@@ -22,14 +31,65 @@ class _UserRegistrationState extends State<UserRegistration> {
   final TextEditingController _password = TextEditingController();
   final TextEditingController _optional = TextEditingController();
 
-  _register() {
-    if (_formKey.currentState!.validate()) {}
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Error Occured'),
+        content: Text(message),
+        actions: <Widget>[
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('OK!'),
+          )
+        ],
+      ),
+    );
   }
 
+  bool _loading = false;
+  Future<void> _register() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _loading = true;
+      });
+      try {
+        final registerUser =
+            await Provider.of<Auth>(context, listen: false).userData(
+          _fullName.text.trim(),
+          _email.text.trim(),
+          widget.areaId,
+          _street.text.trim(),
+          "${_street.text.trim()},${_houseNo.text.trim()},${_landmark.text.trim()},${widget.areaId}",
+          widget.areaId,
+          widget.userId,
+          _password.text.trim(),
+          _optional.text,
+          _houseNo.text.trim(),
+          _landmark.text.trim(),
+        );
+        setState(() {
+          _loading = false;
+        });
+
+        if (registerUser[1]["steps_completed"] == 4) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Home()),
+          );
+        } else {
+          _showErrorDialog(context, "Something Went Worng");
+        }
+      } catch (error) {
+        rethrow;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-   
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -147,7 +207,11 @@ class _UserRegistrationState extends State<UserRegistration> {
                   ),
                   const CoustomSpace(),
 
-                  CoustomButton(onPressed: _register, text: "Register"),
+                  _loading
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : CoustomButton(onPressed: _register, text: "Register"),
                   // ignore: deprecated_member_use
                 ],
               ),
