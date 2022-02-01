@@ -40,6 +40,7 @@ class LocationModel {
         "status": status,
         "deleted": deleted,
       };
+  @override
   String toString() {
     return toJson().toString();
   }
